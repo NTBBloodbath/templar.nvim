@@ -37,31 +37,31 @@ Lets go throught an example to see how to write a templar template file.
 Consider the examples lua snippet above, and espacially the c header file.
 Here is an example template file for c header >
 
-    #ifndef %{'__' .. vim.fn.expand("%:t"):upper():gsub("%.", "_"):gsub("%-", "_") .. '__'}
-    #define %{0}
+    #ifndef %{'__' .. vim.fn.expand("%:t"):upper():gsub("%.", "_"):gsub("%-", "_") .. '__'%}
+    #define %{0%}
 
-    %{CURSOR}
+    %{CURSOR%}
 
-    #endif /* %{0} */
+    #endif /* %{0%} */
 <
 							      *templar-fields*
-The syntax is pretty basic, we call every `%{*}` part a field.
+The syntax is pretty basic, we call every `%{*%}` part a field.
 As we see we have 3 types of fields here :
 
-    `%{Lua}`		This fields will be evaluated to the Lua expression
+    `%{Lua%}`		This fields will be evaluated to the Lua expression
 			they contain. The value will then be stored in a 0
 			based array so that you can recall their values.
 			Note: In Lua fields, you can see that
 			`vim.fn.expand('%')` will return the file which
 			triggered `BufNewFile` autocommand.
 
-    `%{N}`		With these fields you can recall a previously
+    `%{N%}`		With these fields you can recall a previously
 			evaluated field. In our example we recall the
 			first (0-based indexing) field value.
 
-    `%{CURSOR}`		This is where the cursor will be after template
+    `%{CURSOR%}`	This is where the cursor will be after template
 			expansion.
 
-Note: More special fields might come, like a special `%{INCLUDE}`
+Note: More special fields might come, like a special `%{INCLUDE%}`
 
 vim:tw=78:ts=8:noet:ft=help:norl:

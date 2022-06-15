@@ -28,13 +28,13 @@ local function parse_template(file)
 	local values = {}
 
 	for index, line in ipairs(lines) do
-		local tag = vim.fn.matchstr(line, "%{\\zs.\\+\\ze}")
+		local tag = vim.fn.matchstr(line, "%{\\zs.\\+\\ze%}")
 
 		if not tag or tag:len() == 0 then
 			evaluated[index] = line
 		elseif tag == "CURSOR" then
 			future_cursor = { actual_cursor[1] + index - 1, line:find("CURSOR") - 3 }
-			evaluated[index] = line:gsub("%%{.+}", "")
+			evaluated[index] = line:gsub("%%{.+%%}", "")
 		elseif tag:match("INCLUDE %g+") then
 			-- Special INCLUDE tag
 			-- Includes the content of a template into current
@@ -45,7 +45,7 @@ local function parse_template(file)
 
 			vim.list_extend(evaluated, output)
 		else
-			evaluated[index] = line:gsub("%%{.+}", parse_field(tag, values))
+			evaluated[index] = line:gsub("%%{.+%%}", parse_field(tag, values))
 		end
 	end
 	future_cursor = future_cursor or actual_cursor
