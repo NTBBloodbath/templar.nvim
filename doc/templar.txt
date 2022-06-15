@@ -1,4 +1,4 @@
-*templar.txt*	For Neovim 5.0	Last Change: 2021 feb 24
+*templar.txt*	For Neovim 5.0	Last Change: 2022 jun 14
 
 *Templar.nvim*
 A template manager with field expansion.
@@ -27,55 +27,17 @@ Non-goals~
     1. User interaction during expansion (see goal 2)
 
 ============================================================================
-1. Registering template files
-							    *templar-register*
-
-Registering a template is adding an autocmd to Nvim, which triggers templar
-when a new file of the given extension is opened.
-
-							    *templar.register*
-Use `templar.register(regex [,alias])` lua function to register a new template.
-
-For this, here is a lua example snippet >
-
-    local templar = require'templar'
-    templar.register('*.h')
-    templar.register('*.vim')
-    templar.register('doc/*.txt')
-    templar.register('project/doc/*.txt', 'project_docs')
-
-This registers templates for c headers, vim files and help files.
-When opening a new `.h` file, `templar` wil search for `templates/template.h`
-files in your runtime files.
-In the examples the `doc/*.txt` entry will search in
-`templates/doc/template.txt` in your runtime files.
-In the examples the `project/doc/*.txt` entry will search in
-`templates/project_docs.txt` in your runtime files instead of 
-`templates/project/docs/template.txt`
-
-							     *TemplarRegister*
-If you want do to this from vimscript you can also use the `TemplarRegister`
-command.
-
-    :TemplarRegister {regex}		Registers a new template.
-    :TemplarRegister {regex} {alias}	Registers a new template with alias
-
-Which would turn the lua code above in this >
-
-    TemplarRegister *.h
-    TemplarRegister *.vim
-    TemplarRegister doc/*.txt
-    TemplarRegister project/doc/*.txt project_docs
-
-============================================================================
-2. Writing template files
+1. Writing template files
 							     *templar-writing*
+
+A template file can have any name you want and must be placed into a
+`templates` directory in your configuration root directory.
 
 Lets go throught an example to see how to write a templar template file.
 Consider the examples lua snippet above, and espacially the c header file.
 Here is an example template file for c header >
 
-    #ifndef %{'__' . substitute(toupper(expand('%:t')), '\(\.\|-\)', '_', 0) . '__'}
+    #ifndef %{'__' .. vim.fn.expand("%:t"):upper():gsub("%.", "_"):gsub("%-", "_") .. '__'}
     #define %{0}
 
     %{CURSOR}
@@ -86,12 +48,12 @@ Here is an example template file for c header >
 The syntax is pretty basic, we call every `%{*}` part a field.
 As we see we have 3 types of fields here :
 
-    `%{VimL}`		This fields will be evaluated to the Viml expression
+    `%{Lua}`		This fields will be evaluated to the Lua expression
 			they contain. The value will then be stored in a 0
 			based array so that you can recall their values.
-			Note: In VimL fields, you can see that `expand('%')`
-			will return the file which triggered `BufNewFile`
-			autocommand.
+			Note: In Lua fields, you can see that
+			`vim.fn.expand('%')` will return the file which
+			triggered `BufNewFile` autocommand.
 
     `%{N}`		With these fields you can recall a previously
 			evaluated field. In our example we recall the
